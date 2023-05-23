@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+echo "addgroup --gid ${HOST_GROUP_ID} ${HOST_GROUP_NAME}"
+echo "useradd -u ${HOST_USER_ID} -g ${HOST_GROUP_ID} -ms /bin/bash -d /home/${HOST_USER_NAME} ${HOST_USER_NAME}"
+
+# /usr/sbin/crond &
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- php-fpm "$@"
+fi
+
+exec "$@"

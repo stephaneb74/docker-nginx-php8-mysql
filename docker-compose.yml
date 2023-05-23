@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  nginx_server:
+    build:
+      context: './nginx'
+    image: docker-web/nginx_server:2023052201
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/www/html:/var/www/html
+    container_name: "docker_web_nginx_server_container"
+
+  php_fpm_server:
+    build:
+      context: "./php-fpm"
+    image: docker-web/php8_fpm_server:2023052201
+    container_name: "docker_web_php8_fpm_server_container"
+    environment:
+      - HOST_USER_NAME=$(id -un)
+      - HOST_GROUP_NAME=$(id -gn)
+      - HOST_USER_ID=$(id -u)
+      - HOST_GROUP_ID=$(id -g)
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/www/html:/var/www/html
+
+  mysql_server:
+    build:
+      context: './mysql'
+    image: docker-web/mysql_server:2023052201
+    container_name: "docker_web_mysql_server_container"
+    environment:
+      - MYSQL_ROOT_PASSWORD=MotDePasseRoot
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
