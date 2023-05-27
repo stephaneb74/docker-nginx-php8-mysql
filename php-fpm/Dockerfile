@@ -27,7 +27,8 @@ RUN apk --no-cache add icu-dev \
     libssh2-dev \
     build-base \
     bash \
-    libmemcached-dev
+    libmemcached-dev \
+    mysql-client
 
 RUN apk add --no-cache --virtual .build-deps-full \
         binutils-gold \
@@ -84,9 +85,14 @@ RUN pecl install raphf && \
 
 COPY docker-php-entrypoint /usr/local/bin
 COPY php.ini /usr/local/etc/php
+COPY phpmyadmin/config.inc.php /usr/local/share
 
 WORKDIR /usr/local/etc/php-fpm.d
-# COPY conf.d/www.conf .
+COPY conf.d/www.conf .
+RUN <<EOF cat > zz-docker.conf
+[global]
+daemonize = no
+EOF
 
 EXPOSE 9001
 CMD ["php-fpm"]

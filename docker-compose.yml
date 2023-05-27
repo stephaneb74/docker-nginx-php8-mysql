@@ -10,22 +10,22 @@ services:
       - "443:443"
     volumes:
       - /var/www/html:/var/www/html
+      - /var/log/docker-web:/var/log
+      - ./share/phpmyadmin:/usr/share/nginx/html/phpmyadmin
     container_name: "docker_web_nginx_server_container"
 
   php_fpm_server:
     build:
       context: "./php-fpm"
     image: docker-web/php8_fpm_server:2023052201
+    # user: "${UID}:${GID}"
     container_name: "docker_web_php8_fpm_server_container"
-    environment:
-      - HOST_USER_NAME=$(id -un)
-      - HOST_GROUP_NAME=$(id -gn)
-      - HOST_USER_ID=$(id -u)
-      - HOST_GROUP_ID=$(id -g)
     ports:
       - "9001:9001"
     volumes:
       - /var/www/html:/var/www/html
+      - /var/log/docker-web:/var/log
+      - ./share/phpmyadmin:/usr/share/nginx/html/phpmyadmin
 
   mysql_server:
     build:

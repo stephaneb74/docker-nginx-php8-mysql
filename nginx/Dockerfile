@@ -13,6 +13,11 @@ RUN apk --no-cache add nano \
     curl \
     wget
 
+WORKDIR /etc/nginx
+COPY conf/nginx.conf .
+COPY conf/phpmyadmin.conf .
+COPY conf/default.conf .
+
 ###
 # Défini le répertoire /etc/nginx/conf.d comme répertoire courant.
 ###
@@ -31,24 +36,6 @@ COPY ./ssl/*.crt ./
 
 WORKDIR /etc/ssl/private
 COPY ./ssl/*.key ./
-
-###
-# Création d'un dossier temporaire.
-###
-RUN mkdir /temp
-WORKDIR /temp
-
-###
-# Téléchargement de phpMyAdmin
-###
-RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip
-
-###
-# Extraction des fichiers de l'archive phpMyAdmin et déplacement des
-# fichiers sour /usr/local/share/phpmyadmin
-###
-RUN unzip phpMyAdmin-5.2.1-all-languages.zip && \
-    mv phpMyAdmin-5.2.1-all-languages /usr/local/share/phpmyadmin
 
 ###
 # Changement du répertoire en cours pour /etc/ssl/private

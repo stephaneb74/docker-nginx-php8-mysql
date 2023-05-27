@@ -1,10 +1,31 @@
 #!/bin/sh
 set -e
 
-echo "addgroup --gid ${HOST_GROUP_ID} ${HOST_GROUP_NAME}"
-echo "useradd -u ${HOST_USER_ID} -g ${HOST_GROUP_ID} -ms /bin/bash -d /home/${HOST_USER_NAME} ${HOST_USER_NAME}"
+# Installing phpMyAdmin if not present
+file=/usr/share/nginx/html/phpmyadmin/config.inc.php
 
-# /usr/sbin/crond &
+if [ ! -f "$file" ]; then
+  cd /tmp
+  wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip
+  unzip phpMyAdmin-5.2.1-all-languages.zip
+
+  cd /tmp/phpMyAdmin-5.2.1-all-languages
+  mv * /usr/share/nginx/html/phpmyadmin
+
+  cd /tmp
+  rm -rf phpMyAdmin-5.2.1-all-languages
+  rm -f phpMyAdmin-5.2.1-all-languages.zip
+
+  cd /usr/share/nginx/html/phpmyadmin
+  cp config.sample.inc.php config.inc.php
+
+  sed -i "s/\(\$cfg\['blowfish_secret'\] = \)'';/\1'MyBlowfishSecret1234567890ABCDEF';/" config.inc.php
+  sed -i "s/'localhost'/'docker_web_mysql_server_container'/g" config.inc.php
+  mkdir -p /usr/share/nginx/html/phpmyadmin/tmp
+  chmod -R 0777 /usr/share/nginx/html/phpmyadmin/tmp
+fi
+
+/usr/sbin/crond &
 
 # first arg is `-f` or `--some-option`
 if [ "${1#-}" != "$1" ]; then
